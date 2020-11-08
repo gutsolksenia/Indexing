@@ -1,4 +1,5 @@
-import com.sun.istack.internal.NotNull;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
