@@ -20,11 +20,13 @@ public class SplitKeyExtractor implements KeyExtractor {
         this.regexp = regexp;
     }
 
+    @NotNull
     @Override
     public Set<String> extract(@NotNull String file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line = null;
+        String line;
         Set<String> keys = new HashSet<>();
+        keys.add("");
         try {
             while ((line = reader.readLine()) != null) {
                 keys.addAll(Arrays.asList(line.split(regexp)));

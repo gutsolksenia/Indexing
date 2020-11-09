@@ -7,12 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class SplitKeyExtractorTest {
+public class SplitKeyExtractorTest extends TestBase {
     @Test
-    public void simpleTest() throws IOException {
+    public void simpleTest() throws Exception {
         KeyExtractor keyExtractor = new SplitKeyExtractor();
-        String path = "test/resources/test1";
+        String path = getFile("test1");
         Set<String> extracted = keyExtractor.extract(path);
+        assertTrue(extracted.contains(""));
         assertTrue(extracted.contains("aaaa"));
         assertTrue(extracted.contains("bbbb"));
         assertTrue(extracted.contains("cccc"));
@@ -24,6 +25,6 @@ public class SplitKeyExtractorTest {
         assertFalse(extracted.contains("cc"));
         assertFalse(extracted.contains("ddd"));
         assertFalse(extracted.contains("testt"));
+        assertFalse(extracted.contains(" "));
     }
-
 }
