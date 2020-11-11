@@ -1,3 +1,5 @@
+package com.gutsolk.indexing;
+
 import org.jetbrains.annotations.NotNull;
 
 public class TestBase {

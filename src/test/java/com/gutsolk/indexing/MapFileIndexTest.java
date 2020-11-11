@@ -1,6 +1,7 @@
+package com.gutsolk.indexing;
+
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MapFileIndexTest extends TestBase {
     @Test
     public void simpleTest() throws Exception {
-        FileIndex fileIndex = new MapFileIndex(new SplitKeyExtractor());
+        FileIndex fileIndex = new MapFileIndex();
         String path1 = getFile("test1");
         String path2 = getFile("test2");
         fileIndex.add(path1);

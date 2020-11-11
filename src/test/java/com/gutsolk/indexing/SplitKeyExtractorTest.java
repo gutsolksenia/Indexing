@@ -1,6 +1,7 @@
+package com.gutsolk.indexing;
+
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

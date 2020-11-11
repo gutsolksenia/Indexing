@@ -1,4 +1,6 @@
+package com.gutsolk.indexing;
 
+import com.gutsolk.indexing.KeyExtractor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
