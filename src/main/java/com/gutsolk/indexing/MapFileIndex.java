@@ -13,13 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MapFileIndex implements FileIndex {
     private final Map<String, Set<String>> index = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> filesToKeys = new ConcurrentHashMap<>();
+    private final FileUpdatesWatcher fileUpdatesWatcher = new FileUpdatesWatcher(this::remove, this::update);
 
     private final KeyExtractor keyExtractor;
-    private FileUpdatesWatcher fileUpdatesWatcher = new FileUpdatesWatcherImpl(this::remove, this::update);
 
     public MapFileIndex() {
         this(new SplitKeyExtractor());
-        fileUpdatesWatcher.start();
     }
 
     public MapFileIndex(@NotNull KeyExtractor keyExtractor) {
@@ -28,9 +27,7 @@ public class MapFileIndex implements FileIndex {
 
     @Override
     public void add(@NotNull String file) throws Exception {
-        if (fileUpdatesWatcher != null) {
-            fileUpdatesWatcher.add(new File(file));
-        }
+        fileUpdatesWatcher.add(new File(file));
         Set<String> keys = keyExtractor.extract(file);
         for (String key : keys) {
             index.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet())
@@ -41,7 +38,7 @@ public class MapFileIndex implements FileIndex {
 
     @Override
     public List<String> find(@NotNull String key) {
-        return ImmutableList.copyOf((index.getOrDefault(key, Collections.emptySet())));
+        return ImmutableList.copyOf(index.getOrDefault(key, Collections.emptySet()));
     }
 
     @Override

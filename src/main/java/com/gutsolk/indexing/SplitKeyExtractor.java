@@ -1,6 +1,5 @@
 package com.gutsolk.indexing;
 
-import com.gutsolk.indexing.KeyExtractor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -11,11 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SplitKeyExtractor implements KeyExtractor {
-    private static final String WHITESPACE = "\\s";
+    private static final String WHITESPACES = "\\s+";
     private final String regexp;
 
     public SplitKeyExtractor() {
-        this(WHITESPACE);
+        this(WHITESPACES);
     }
 
     public SplitKeyExtractor(@NotNull String regexp) {
@@ -28,7 +27,6 @@ public class SplitKeyExtractor implements KeyExtractor {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line;
         Set<String> keys = new HashSet<>();
-        keys.add("");
         try {
             while ((line = reader.readLine()) != null) {
                 keys.addAll(Arrays.asList(line.split(regexp)));

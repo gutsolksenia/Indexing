@@ -14,7 +14,7 @@ public class SplitKeyExtractorTest extends TestBase {
         KeyExtractor keyExtractor = new SplitKeyExtractor();
         String path = getFile("test1");
         Set<String> extracted = keyExtractor.extract(path);
-        assertTrue(extracted.contains(""));
+        assertFalse(extracted.contains(""));
         assertTrue(extracted.contains("aaaa"));
         assertTrue(extracted.contains("bbbb"));
         assertTrue(extracted.contains("cccc"));
