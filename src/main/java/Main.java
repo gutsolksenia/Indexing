@@ -15,6 +15,7 @@ public class Main {
 
     public static void main(String... args) {
         FileIndex fileIndex = new MapFileIndex();
+        fileIndex.run();
         Scanner in = new Scanner(System.in);
         while (true) {
             String next = in.nextLine();
@@ -27,6 +28,7 @@ public class Main {
             } else if (GET.equals(input[0])) {
                 get(fileIndex, next, input);
             } else if (EXIT.equals(input[0])) {
+                fileIndex.stop();
                 break;
             } else if (HELP.equals(input[0])) {
                 help();
@@ -42,7 +44,7 @@ public class Main {
             return;
         }
         String key = input.length == 2 ? input[1] : "";
-        List<String> files = fileIndex.find(key);
+        List<String> files = fileIndex.get(key);
         System.out.println("Got: \n" +
                 (files.isEmpty() ? "Nothing" : "") +
                 files.stream()

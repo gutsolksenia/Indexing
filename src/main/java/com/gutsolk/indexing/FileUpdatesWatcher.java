@@ -13,11 +13,13 @@ import java.util.function.Consumer;
 import static java.nio.file.Files.getLastModifiedTime;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-public class FileUpdatesWatcher {
+public class FileUpdatesWatcher implements Runnable {
+    volatile boolean isRunning = false;
+
     private static final int DELAY_IN_SECONDS = 1;
 
     private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(DELAY_IN_SECONDS);
-    private final Map<Path, FileTime> lastUpdate = new ConcurrentHashMap<>();
+    private final Map<Path, FileTime> fileToLastModified = new ConcurrentHashMap<>();
     private final Consumer<String> onDelete;
     private final Consumer<String> onUpdate;
 
@@ -25,17 +27,16 @@ public class FileUpdatesWatcher {
                               @NotNull Consumer<String> onUpdate) {
         this.onDelete = onDelete;
         this.onUpdate = onUpdate;
-        executor.scheduleWithFixedDelay(this::checkUpdates, DELAY_IN_SECONDS, DELAY_IN_SECONDS, SECONDS);
     }
 
     public void add(@NotNull File file) {
         Path path = file.toPath();
-        lastUpdate.put(path, fileTime(path));
+        fileToLastModified.put(path, fileTime(path));
     }
 
     public void remove(@NotNull File file) {
         Path path = file.toPath();
-        lastUpdate.remove(path);
+        fileToLastModified.remove(path);
     }
 
     private static FileTime fileTime(Path path) {
@@ -49,17 +50,17 @@ public class FileUpdatesWatcher {
     private void checkUpdates() {
         List<String> deleted = new ArrayList<>();
         List<String> updated = new ArrayList<>();
-        for (Path path: lastUpdate.keySet()) {
+        for (Path path: fileToLastModified.keySet()) {
             if (!path.toFile().exists()) {
                 deleted.add(path.toString());
                 continue;
             }
             FileTime fileTime = fileTime(path);
-            FileTime oldFileTime = lastUpdate.get(path);
+            FileTime oldFileTime = fileToLastModified.get(path);
             if (oldFileTime != null &&
                     fileTime.compareTo(oldFileTime) > 0) {
                 updated.add(path.toString());
-                lastUpdate.put(path, fileTime);
+                fileToLastModified.put(path, fileTime);
             }
         }
         deleted.forEach(name -> this.remove(new File(name)));
@@ -67,5 +68,33 @@ public class FileUpdatesWatcher {
             onDelete.accept(file);
         }
         updated.forEach(onUpdate);
+    }
+
+    @Override
+    public void run() {
+        if (!isRunning) {
+            executor.scheduleWithFixedDelay(this::checkUpdates, DELAY_IN_SECONDS, DELAY_IN_SECONDS, SECONDS);
+        }
+        isRunning = true;
+    }
+
+    public void stop() {
+        executor.shutdown(); // Disable new tasks from being submitted
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!executor.awaitTermination(60, SECONDS)) {
+                executor.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!executor.awaitTermination(60, SECONDS))
+                    System.err.println("Pool did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            executor.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+
+        }
+        isRunning = false;
     }
 }

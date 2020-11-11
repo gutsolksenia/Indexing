@@ -18,6 +18,7 @@ public class FileUpdatesWatcherTest {
         List<String> updated = new CopyOnWriteArrayList<>();
         List<String> deleted = new CopyOnWriteArrayList<>();
         FileUpdatesWatcher fileUpdatesWatcher = new FileUpdatesWatcher(deleted::add, updated::add);
+        fileUpdatesWatcher.run();
 
         //create
         File file1 = createFile("testname1");
@@ -43,6 +44,7 @@ public class FileUpdatesWatcherTest {
         Thread.sleep(2000);
         assertEquals(asList(file1.getName()), updated);
         assertEquals(asList(file2.getName(), file1.getName()), deleted);
+        fileUpdatesWatcher.stop();
     }
 
     private static File createFile(String filename) throws IOException {

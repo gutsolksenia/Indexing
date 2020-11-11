@@ -17,26 +17,26 @@ public class MapFileIndexTest extends TestBase {
         fileIndex.add(path2);
 
         //get
-        assertEquals(fileIndex.find("aaaa"), Arrays.asList(path1, path2));
-        assertEquals(fileIndex.find("cccc"), Arrays.asList(path1, path2));
-        assertEquals(fileIndex.find("dddd"), Arrays.asList(path1, path2));
-        assertEquals(fileIndex.find("test"), Arrays.asList(path1));
-        assertEquals(fileIndex.find("test2"), Arrays.asList(path2));
-        assertTrue(fileIndex.find("a").isEmpty());
-        assertTrue((fileIndex.find("a").isEmpty()));
-        assertTrue((fileIndex.find("bb").isEmpty()));
-        assertTrue((fileIndex.find("cc").isEmpty()));
-        assertTrue((fileIndex.find("ddd").isEmpty()));
-        assertTrue((fileIndex.find("testt").isEmpty()));
+        assertEquals(fileIndex.get("aaaa"), Arrays.asList(path1, path2));
+        assertEquals(fileIndex.get("cccc"), Arrays.asList(path1, path2));
+        assertEquals(fileIndex.get("dddd"), Arrays.asList(path1, path2));
+        assertEquals(fileIndex.get("test"), Arrays.asList(path1));
+        assertEquals(fileIndex.get("test2"), Arrays.asList(path2));
+        assertTrue(fileIndex.get("a").isEmpty());
+        assertTrue((fileIndex.get("a").isEmpty()));
+        assertTrue((fileIndex.get("bb").isEmpty()));
+        assertTrue((fileIndex.get("cc").isEmpty()));
+        assertTrue((fileIndex.get("ddd").isEmpty()));
+        assertTrue((fileIndex.get("testt").isEmpty()));
 
         //remove
         assertTrue(fileIndex.remove(path1));
         assertTrue(fileIndex.remove(path2));
-        assertTrue(fileIndex.find("aaaa").isEmpty());
-        assertTrue(fileIndex.find("cccc").isEmpty());
-        assertTrue(fileIndex.find("dddd").isEmpty());
-        assertTrue(fileIndex.find("test").isEmpty());
-        assertTrue(fileIndex.find("test2").isEmpty());
+        assertTrue(fileIndex.get("aaaa").isEmpty());
+        assertTrue(fileIndex.get("cccc").isEmpty());
+        assertTrue(fileIndex.get("dddd").isEmpty());
+        assertTrue(fileIndex.get("test").isEmpty());
+        assertTrue(fileIndex.get("test2").isEmpty());
         assertFalse(fileIndex.remove(path1));
         assertFalse(fileIndex.remove(path2));
     }
@@ -50,13 +50,13 @@ public class MapFileIndexTest extends TestBase {
         //add
         FileIndex fileIndex = new MapFileIndex();
         fileIndex.add(directory);
-        assertEquals(fileIndex.find("1"), Arrays.asList(path1));
-        assertEquals(fileIndex.find("2"), Arrays.asList(path2));
+        assertEquals(fileIndex.get("1"), Arrays.asList(path1));
+        assertEquals(fileIndex.get("2"), Arrays.asList(path2));
 
         //remove file
         assertTrue(fileIndex.remove(path1));
-        assertTrue(fileIndex.find("1").isEmpty());
-        assertEquals(fileIndex.find("2"), Arrays.asList(path2));
+        assertTrue(fileIndex.get("1").isEmpty());
+        assertEquals(fileIndex.get("2"), Arrays.asList(path2));
 
         //remove dir
         assertTrue(fileIndex.remove(directory));

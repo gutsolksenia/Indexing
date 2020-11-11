@@ -42,7 +42,7 @@ public class MapFileIndex implements FileIndex {
     }
 
     @Override
-    public List<String> find(@NotNull String key) {
+    public List<String> get(@NotNull String key) {
         return ImmutableList.copyOf(index.getOrDefault(key, Collections.emptySet()));
     }
 
@@ -69,6 +69,11 @@ public class MapFileIndex implements FileIndex {
         return true;
     }
 
+    @Override
+    public void stop() {
+        fileUpdatesWatcher.stop();
+    }
+
     private void update(@NotNull String file) {
         remove(file);
         add(file);
@@ -87,4 +92,11 @@ public class MapFileIndex implements FileIndex {
         }
         return res;
     }
+
+    @Override
+    public void run() {
+        fileUpdatesWatcher.run();
+    }
+
+
 }
