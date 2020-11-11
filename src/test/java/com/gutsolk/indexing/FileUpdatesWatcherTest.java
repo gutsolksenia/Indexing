@@ -29,18 +29,18 @@ public class FileUpdatesWatcherTest {
 
         //update
         updateFile(file1);
-        Thread.sleep(2000); //TODO
+        Thread.sleep(2000);
         assertEquals(asList(file1.getName()), updated);
         assertTrue(deleted.isEmpty());
 
         //delete
         file2.delete();
-        Thread.sleep(2000);//TODO
+        Thread.sleep(2000);
         assertEquals(asList(file1.getName()), updated);
         assertEquals(asList(file2.getName()), deleted);
 
         file1.delete();
-        Thread.sleep(2000); //TODO
+        Thread.sleep(2000);
         assertEquals(asList(file1.getName()), updated);
         assertEquals(asList(file2.getName(), file1.getName()), deleted);
     }
@@ -53,7 +53,7 @@ public class FileUpdatesWatcherTest {
 
     private static void updateFile(File file) throws IOException {
         FileWriter fileWriter = new FileWriter(file);
-        fileWriter.write("test");
+        fileWriter.write("testtttttt");
         fileWriter.close();
     }
 }

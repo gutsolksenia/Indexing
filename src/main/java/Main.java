@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 public class Main {
     private static final String ADD = "add";
     private static final String GET = "get";
@@ -54,17 +56,17 @@ public class Main {
         }
         try {
             fileIndex.add(input[1]);
-            System.out.println(String.format(
-                    "Successfully added file \"%s\"", input[1]));
+            System.out.println(
+                    format("Successfully added file \"%s\"", input[1]));
         } catch (Exception e) {
             System.out.println(
-                    String.format("Unable to add file cause: %s",
+                    format("Unable to add file cause: %s",
                             e.getMessage()));
         }
     }
 
     private static void invalidInput(String input) {
-        System.out.println(String.format("Invalid input \"%s\"\n", input));
+        System.out.println(format("Invalid input \"%s\"\n", input));
         help();
     }
 

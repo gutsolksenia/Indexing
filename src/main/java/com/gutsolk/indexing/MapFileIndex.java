@@ -26,13 +26,18 @@ public class MapFileIndex implements FileIndex {
     }
 
     @Override
-    public void add(@NotNull String file) throws Exception {
-        fileUpdatesWatcher.add(new File(file));
-        Set<String> keys = keyExtractor.extract(file);
-        for (String key : keys) {
-            index.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet())
-                    .add(file);
-            filesToKeys.put(file, keys);
+    public void add(@NotNull String path) {
+        File file = new File(path);
+        if (file.isDirectory()) {
+            addDirectory(file);
+        } else {
+            fileUpdatesWatcher.add(file);
+            Set<String> keys = keyExtractor.extract(path);
+            for (String key : keys) {
+                index.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet())
+                        .add(path);
+                filesToKeys.put(path, keys);
+            }
         }
     }
 
@@ -42,28 +47,44 @@ public class MapFileIndex implements FileIndex {
     }
 
     @Override
-    public boolean remove(@NotNull String file) {
-        Set<String> keys = filesToKeys.remove(file);
+    public boolean remove(@NotNull String path) {
+        File file = new File(path);
+        if (file.isDirectory()) {
+            return removeDirectory(file);
+        }
+        Set<String> keys = filesToKeys.remove(path);
         if (keys == null || keys.isEmpty()) {
             return false;
         }
         for (String key : keys) {
             Set<String> files = index.get(key);
             if (files != null) {
-                files.remove(file);
+                files.remove(path);
+            }
+            if (files.isEmpty()) {
+                index.remove(key);
             }
         }
-        fileUpdatesWatcher.remove(new File(file));
+        fileUpdatesWatcher.remove(file);
         return true;
     }
 
     private void update(@NotNull String file) {
         remove(file);
-        try {
-            add(file);
-        } catch (Exception e) {
-            //TODO
-        }
+        add(file);
+    }
 
+    private void addDirectory(File dir) {
+        for (File file : dir.listFiles()) {
+            add(file.getPath());
+        }
+    }
+
+    private boolean removeDirectory(File dir) {
+        boolean res = false;
+        for (File file : dir.listFiles()) {
+            res |= remove(file.getPath());
+        }
+        return res;
     }
 }

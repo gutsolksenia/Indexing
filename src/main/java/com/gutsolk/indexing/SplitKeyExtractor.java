@@ -23,17 +23,22 @@ public class SplitKeyExtractor implements KeyExtractor {
 
     @NotNull
     @Override
-    public Set<String> extract(@NotNull String file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line;
-        Set<String> keys = new HashSet<>();
+    public Set<String> extract(@NotNull String file) {
+        BufferedReader reader;
         try {
-            while ((line = reader.readLine()) != null) {
-                keys.addAll(Arrays.asList(line.split(regexp)));
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            Set<String> keys = new HashSet<>();
+            try {
+                while ((line = reader.readLine()) != null) {
+                    keys.addAll(Arrays.asList(line.split(regexp)));
+                }
+                return keys;
+            } finally {
+                reader.close();
             }
-            return keys;
-        } finally {
-            reader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

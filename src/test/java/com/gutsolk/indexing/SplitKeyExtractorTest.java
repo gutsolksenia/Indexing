@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SplitKeyExtractorTest extends TestBase {
     @Test
-    public void simpleTest() throws Exception {
+    public void simpleTest() {
         KeyExtractor keyExtractor = new SplitKeyExtractor();
         String path = getFile("test1");
         Set<String> extracted = keyExtractor.extract(path);

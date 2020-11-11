@@ -11,20 +11,21 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 import static java.nio.file.Files.getLastModifiedTime;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class FileUpdatesWatcher {
-    private static final int TIMEOUT_IN_SECONDS = 1;
+    private static final int DELAY_IN_SECONDS = 1;
 
-    private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1);
-    private final Consumer<String> onDelete;
-    private final Consumer<String> onChange;
+    private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(DELAY_IN_SECONDS);
     private final Map<Path, FileTime> lastUpdate = new ConcurrentHashMap<>();
+    private final Consumer<String> onDelete;
+    private final Consumer<String> onUpdate;
 
     public FileUpdatesWatcher(@NotNull Consumer<String> onDelete,
-                              @NotNull Consumer<String> onChange) {
+                              @NotNull Consumer<String> onUpdate) {
         this.onDelete = onDelete;
-        this.onChange = onChange;
-        executor.scheduleWithFixedDelay(this::checkUpdates, 0, TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);
+        this.onUpdate = onUpdate;
+        executor.scheduleWithFixedDelay(this::checkUpdates, DELAY_IN_SECONDS, DELAY_IN_SECONDS, SECONDS);
     }
 
     public void add(@NotNull File file) {
@@ -46,21 +47,25 @@ public class FileUpdatesWatcher {
     }
 
     private void checkUpdates() {
-        List<String> toRemove = new ArrayList<>();
-        List<String> toChange = new ArrayList<>();
+        List<String> deleted = new ArrayList<>();
+        List<String> updated = new ArrayList<>();
         for (Path path: lastUpdate.keySet()) {
             if (!path.toFile().exists()) {
-                toRemove.add(path.toString());
+                deleted.add(path.toString());
                 continue;
             }
             FileTime fileTime = fileTime(path);
-            if (fileTime.compareTo(lastUpdate.get(path)) > 0) {
-                toChange.add(path.toString());
+            FileTime oldFileTime = lastUpdate.get(path);
+            if (oldFileTime != null &&
+                    fileTime.compareTo(oldFileTime) > 0) {
+                updated.add(path.toString());
                 lastUpdate.put(path, fileTime);
             }
         }
-        toRemove.forEach(name -> this.remove(new File(name)));
-        toRemove.forEach(onDelete);
-        toChange.forEach(onChange);
+        deleted.forEach(name -> this.remove(new File(name)));
+        for (String file : deleted) {
+            onDelete.accept(file);
+        }
+        updated.forEach(onUpdate);
     }
 }
